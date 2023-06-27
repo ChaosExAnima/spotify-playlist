@@ -1,3 +1,10 @@
+import {
+	authorizePKCE,
+	fetchAuthInfo,
+	getAuthInfo,
+	getRedirectCode,
+} from 'lib/auth.ts';
+import { queryPlaylists, queryProfile } from 'lib/query.ts';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
@@ -8,13 +15,6 @@ import {
 
 import App from './App.tsx';
 import './index.css';
-import {
-	authorizePKCE,
-	fetchAuthInfo,
-	getAuthInfo,
-	getRedirectCode,
-} from './lib/auth.ts';
-import { queryPlaylists, queryProfile } from './lib/query.ts';
 
 const router = createBrowserRouter([
 	{

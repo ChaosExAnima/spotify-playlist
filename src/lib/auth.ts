@@ -1,4 +1,4 @@
-import { getCookie, setCookie } from './cookie';
+import { getCookie, setCookie } from 'lib/cookie';
 
 interface AuthInfo {
 	access: string;

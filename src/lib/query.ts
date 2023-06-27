@@ -1,4 +1,4 @@
-import { getAuthInfo } from './auth';
+import { getAuthInfo } from 'lib/auth';
 
 export async function fetchFromAPI<Result = unknown>(
 	uri: string,
