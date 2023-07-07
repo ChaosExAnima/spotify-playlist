@@ -15,13 +15,19 @@ export async function fetchFromAPI<Result = unknown>(
 		method,
 	});
 	if (!response.ok) {
-		console.error(`Got error from API: ${response.status}`);
+		throw new Error(`Got error from API: ${response.status}`);
 	}
 	return response.json() as Result;
 }
 
 export function queryProfile() {
 	return fetchFromAPI<SpotifyApi.CurrentUsersProfileResponse>('/me');
+}
+
+export function queryPlaylist(playlistId: string) {
+	return fetchFromAPI<SpotifyApi.PlaylistObjectFull>(
+		`/playlists/${playlistId}`
+	);
 }
 
 export function queryPlaylists() {

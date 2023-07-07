@@ -22,6 +22,14 @@ export function getAuthInfo() {
 }
 
 export function getAuthRedirectUrl(codeChallenge?: string) {
+	if (
+		!import.meta.env.VITE_APP_CLIENT_ID ||
+		!import.meta.env.VITE_APP_REDIRECT
+	) {
+		console.log(import.meta.env);
+
+		throw new Error('Env not set!');
+	}
 	const params = new URLSearchParams({
 		client_id: import.meta.env.VITE_APP_CLIENT_ID,
 		redirect_uri: import.meta.env.VITE_APP_REDIRECT,

@@ -1,10 +1,5 @@
-import {
-	authorizePKCE,
-	fetchAuthInfo,
-	getAuthInfo,
-	getRedirectCode,
-} from 'lib/auth.ts';
-import { queryPlaylists, queryProfile } from 'lib/query.ts';
+import { authorizePKCE } from 'lib/auth.ts';
+import PlaylistPage, { loader as playlistLoader } from 'playlist/index.tsx';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
@@ -13,38 +8,26 @@ import {
 	redirect,
 } from 'react-router-dom';
 
-import App from './App.tsx';
+import HomePage, { loader as homeLoader } from './home.tsx';
 import './index.css';
 
 const router = createBrowserRouter([
 	{
+		Component: HomePage,
 		children: [
 			{
 				loader: async () => {
 					throw redirect(await authorizePKCE());
 				},
-				path: '/login',
+				path: 'login',
+			},
+			{
+				Component: PlaylistPage,
+				loader: playlistLoader,
+				path: 'playlist/:playlist',
 			},
 		],
-		element: <App />,
-		loader: async () => {
-			const authInfo = getAuthInfo();
-			if (authInfo) {
-				const [user, playlists] = await Promise.all([
-					queryProfile(),
-					queryPlaylists(),
-				]);
-				return { playlists, user };
-			}
-
-			if (!getRedirectCode()) {
-				return null;
-			}
-			const codeVerifier = localStorage.getItem('code_verifier');
-			await fetchAuthInfo(codeVerifier);
-			localStorage.removeItem('code_verifier');
-			throw redirect('/');
-		},
+		loader: homeLoader,
 		path: '/',
 	},
 ]);
@@ -54,3 +37,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 		<RouterProvider router={router} />
 	</React.StrictMode>
 );
+
+if (import.meta.hot) {
+	import.meta.hot.dispose(() => router.dispose());
+}
