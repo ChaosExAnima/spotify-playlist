@@ -1,12 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'router';
 
-import './App.css';
+import './index.css';
 
 export default function HomePage() {
 	return (
 		<>
 			<h1>Spotify Playlist</h1>
-			<Link to="login">Log In</Link>
+			<Link to="/login">Log In</Link>
 			<footer>
 				<h2>References</h2>
 				<ul>
@@ -31,3 +31,5 @@ export default function HomePage() {
 		</>
 	);
 }
+
+export const Loader = () => ({});

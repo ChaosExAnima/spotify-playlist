@@ -1,4 +1,8 @@
-import { Link, useLoaderData } from 'react-router-dom';
+import { queryPlaylists, queryProfile } from 'lib/query';
+import { loadWithAuth } from 'lib/routing';
+import { useLoaderData } from 'react-router-dom';
+
+import { Link } from '../../router';
 
 interface PlaylistsData {
 	playlists: SpotifyApi.ListOfCurrentUsersPlaylistsResponse;
@@ -14,10 +18,18 @@ export default function PlaylistsPage() {
 			<ul>
 				{playlists.items.map((item) => (
 					<li key={item.id}>
-						<Link to={`/playlist/${item.id}`}>{item.name}</Link>
+						<Link
+							params={{ playlistId: item.id }}
+							to="/playlist/:playlistId"
+						>
+							{item.name}
+						</Link>
 					</li>
 				))}
 			</ul>
 		</>
 	);
 }
+
+export const Loader = () =>
+	loadWithAuth({ playlists: queryPlaylists, user: queryProfile });
