@@ -1,4 +1,5 @@
-import { LoaderFunctionArgs, Params, redirect } from 'react-router-dom';
+import { LoaderFunctionArgs, Params } from 'react-router-dom';
+import { redirect } from 'router';
 
 import { getAuthInfo } from './auth';
 
@@ -23,18 +24,22 @@ export function loadWithAuth<T>(
 ): (args: LoaderFunctionArgs) => Promise<QueryResult<T>> {
 	return async (args): Promise<Readonly<QueryResult<T>>> => {
 		checkAuth();
-		const results: Partial<QueryResult<T>> = {};
-		for (const key in queries) {
-			const query = queries[key];
-			if (query instanceof Function) {
-				results[key] = await query(args);
-			} else {
-				results[key] = await (query as Promise<
-					QueryResult<T>[typeof key]
-				>);
+		try {
+			const results: Partial<QueryResult<T>> = {};
+			for (const key in queries) {
+				const query = queries[key];
+				if (query instanceof Function) {
+					results[key] = await query(args);
+				} else {
+					results[key] = await (query as Promise<
+						QueryResult<T>[typeof key]
+					>);
+				}
 			}
+			return results as QueryResult<T>;
+		} catch (err) {
+			throw redirect('/login');
 		}
-		return results as QueryResult<T>;
 	};
 }
 

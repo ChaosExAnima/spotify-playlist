@@ -23,6 +23,6 @@
 		"strictNullChecks": false,
 		"allowUnreachableCode": true
 	},
-	"include": ["src"],
+	"include": ["globals.d.ts", "src"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }

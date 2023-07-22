@@ -1,4 +1,5 @@
-import { Link } from 'router';
+import { fetchAuthInfo, getAuthInfo, getRedirectCode } from 'lib/auth';
+import { Link, redirect } from 'router';
 
 import './index.css';
 
@@ -32,4 +33,19 @@ export default function HomePage() {
 	);
 }
 
-export const Loader = () => ({});
+export async function Loader(): Promise<void> {
+	const authInfo = getAuthInfo();
+	if (authInfo) {
+		throw redirect('/playlist');
+	}
+	if (!getRedirectCode()) {
+		return null;
+	}
+	const codeVerifier = localStorage.getItem('code_verifier');
+	if (!codeVerifier) {
+		return null;
+	}
+	await fetchAuthInfo(codeVerifier);
+	localStorage.removeItem('code_verifier');
+	throw redirect('/');
+}

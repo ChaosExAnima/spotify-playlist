@@ -1,8 +1,7 @@
 import { queryPlaylists, queryProfile } from 'lib/query';
 import { loadWithAuth } from 'lib/routing';
 import { useLoaderData } from 'react-router-dom';
-
-import { Link } from '../../router';
+import { Link } from 'router';
 
 interface PlaylistsData {
 	playlists: SpotifyApi.ListOfCurrentUsersPlaylistsResponse;
@@ -31,5 +30,7 @@ export default function PlaylistsPage() {
 	);
 }
 
-export const Loader = () =>
-	loadWithAuth({ playlists: queryPlaylists, user: queryProfile });
+export const Loader = loadWithAuth({
+	playlists: queryPlaylists,
+	user: queryProfile,
+});
