@@ -6,7 +6,7 @@ import { Link } from 'router';
 export default function App() {
 	const loggedIn = isLoggedIn();
 	return (
-		<section>
+		<>
 			{loggedIn && (
 				<header>
 					<nav>
@@ -15,16 +15,14 @@ export default function App() {
 								<Link to="/playlist">Playlists</Link>
 							</li>
 							<li>
-								<button onClick={() => null}>Log out</button>
+								<Link to="/logout">Log out</Link>
 							</li>
 						</ul>
 					</nav>
 				</header>
 			)}
-			<main>
-				<Outlet />
-			</main>
+			<Outlet />
 			<Modals />
-		</section>
+		</>
 	);
 }

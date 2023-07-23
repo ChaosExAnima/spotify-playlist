@@ -1,7 +1,5 @@
+import Page from 'components/page';
+
 export default function NotFoundPage() {
-	return (
-		<>
-			<h1>Error: Not Found</h1>
-		</>
-	);
+	return <Page header="Page not found" />;
 }

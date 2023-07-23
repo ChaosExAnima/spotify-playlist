@@ -1,3 +1,4 @@
+import Page from 'components/page';
 import { queryPlaylists, queryProfile } from 'lib/query';
 import { loadWithAuth } from 'lib/routing';
 import { useLoaderData } from 'react-router-dom';
@@ -11,7 +12,7 @@ interface PlaylistsData {
 export default function PlaylistsPage() {
 	const { playlists, user } = useLoaderData() as PlaylistsData;
 	return (
-		<>
+		<Page>
 			<p>Hi, {user.display_name}!</p>
 			<p>You have {playlists.total} playlists to pick from:</p>
 			<ul>
@@ -26,7 +27,7 @@ export default function PlaylistsPage() {
 					</li>
 				))}
 			</ul>
-		</>
+		</Page>
 	);
 }
 

@@ -43,6 +43,10 @@ export function loadWithAuth<T>(
 	};
 }
 
+export function EmptyComponent(): null {
+	return null;
+}
+
 export function checkAuth() {
 	if (!isLoggedIn()) {
 		throw redirect('/');

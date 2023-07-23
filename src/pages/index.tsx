@@ -1,17 +1,19 @@
+import Page from 'components/page';
 import { handleLoginCode, isLoggedIn } from 'lib/auth';
 import { queryProfile } from 'lib/query';
 import { useLoaderData } from 'react-router-dom';
 import { Link } from 'router';
 
-import './index.css';
-
 export default function HomePage() {
 	const user = useLoaderData() as SpotifyApi.CurrentUsersProfileResponse;
 	return (
-		<>
-			<h1>Spotify Playlist</h1>
+		<Page header="Spotify Playlist">
 			{user && <p>Hi, {user.display_name}!</p>}
-			{!user && <Link to="/login">Log In</Link>}
+			{!user && (
+				<p>
+					<Link to="/login">Log In</Link>
+				</p>
+			)}
 			<footer>
 				<h2>References</h2>
 				<ul>
@@ -33,13 +35,12 @@ export default function HomePage() {
 					</li>
 				</ul>
 			</footer>
-		</>
+		</Page>
 	);
 }
 
 export async function Loader(): Promise<SpotifyApi.CurrentUsersProfileResponse | null> {
 	await handleLoginCode();
-	console.log('logged in:', isLoggedIn());
 	if (isLoggedIn()) {
 		try {
 			return await queryProfile();
