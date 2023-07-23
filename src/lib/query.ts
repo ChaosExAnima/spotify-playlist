@@ -35,3 +35,17 @@ export function queryPlaylists() {
 		'/me/playlists'
 	);
 }
+
+export async function queryFeatures(trackIds: string[]) {
+	const response =
+		await fetchFromAPI<SpotifyApi.MultipleAudioFeaturesResponse>(
+			`/audio-features?ids=${trackIds.join(',')}`
+		);
+	return response.audio_features;
+}
+
+export function queryAnalysis(trackId: string) {
+	return fetchFromAPI<SpotifyApi.AudioAnalysisObject>(
+		`/audio-analysis/${trackId}`
+	);
+}
