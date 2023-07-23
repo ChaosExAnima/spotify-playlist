@@ -1,13 +1,17 @@
-import { fetchAuthInfo, getAuthInfo, getRedirectCode } from 'lib/auth';
-import { Link, redirect } from 'router';
+import { handleLoginCode, isLoggedIn } from 'lib/auth';
+import { queryProfile } from 'lib/query';
+import { useLoaderData } from 'react-router-dom';
+import { Link } from 'router';
 
 import './index.css';
 
 export default function HomePage() {
+	const user = useLoaderData() as SpotifyApi.CurrentUsersProfileResponse;
 	return (
 		<>
 			<h1>Spotify Playlist</h1>
-			<Link to="/login">Log In</Link>
+			{user && <p>Hi, {user.display_name}!</p>}
+			{!user && <Link to="/login">Log In</Link>}
 			<footer>
 				<h2>References</h2>
 				<ul>
@@ -33,19 +37,16 @@ export default function HomePage() {
 	);
 }
 
-export async function Loader(): Promise<void> {
-	const authInfo = getAuthInfo();
-	if (authInfo) {
-		throw redirect('/playlist');
+export async function Loader(): Promise<SpotifyApi.CurrentUsersProfileResponse | null> {
+	await handleLoginCode();
+	console.log('logged in:', isLoggedIn());
+	if (isLoggedIn()) {
+		try {
+			return await queryProfile();
+		} catch (err) {
+			console.log(err);
+			return null;
+		}
 	}
-	if (!getRedirectCode()) {
-		return null;
-	}
-	const codeVerifier = localStorage.getItem('code_verifier');
-	if (!codeVerifier) {
-		return null;
-	}
-	await fetchAuthInfo(codeVerifier);
-	localStorage.removeItem('code_verifier');
-	throw redirect('/');
+	return null;
 }

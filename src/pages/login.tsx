@@ -1,6 +1,3 @@
-import { authorizePKCE } from 'lib/auth';
-import { redirect } from 'react-router-dom';
+import { logIn } from 'lib/auth';
 
-export const Loader = async () => {
-	throw redirect(await authorizePKCE());
-};
+export const Loader = logIn;

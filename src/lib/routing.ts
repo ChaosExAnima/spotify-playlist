@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs, Params } from 'react-router-dom';
 import { redirect } from 'router';
 
-import { getAuthInfo } from './auth';
+import { isLoggedIn } from './auth';
 
 type QueryLoaderFunc<T> = (args: LoaderFunctionArgs) => Promise<T>;
 type QueryMap<T> = {
@@ -38,17 +38,15 @@ export function loadWithAuth<T>(
 			}
 			return results as QueryResult<T>;
 		} catch (err) {
-			throw redirect('/login');
+			throw new Response(String(err), { status: 500 });
 		}
 	};
 }
 
 export function checkAuth() {
-	const authInfo = getAuthInfo();
-	if (!authInfo) {
+	if (!isLoggedIn()) {
 		throw redirect('/');
 	}
-	return authInfo;
 }
 
 export function getParamOrThrow(

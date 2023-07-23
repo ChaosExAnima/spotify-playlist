@@ -1,16 +1,16 @@
-import { getAuthInfo } from 'lib/auth';
+import { getToken } from 'lib/auth';
 
 export async function fetchFromAPI<Result = unknown>(
 	uri: string,
 	method: 'GET' | 'POST' = 'GET'
 ) {
-	const authInfo = getAuthInfo();
-	if (!authInfo) {
+	const token = getToken();
+	if (!token) {
 		throw new Error('No auth info found');
 	}
 	const response = await fetch(`https://api.spotify.com/v1${uri}`, {
 		headers: {
-			Authorization: `Bearer ${authInfo.access}`,
+			Authorization: `Bearer ${token}`,
 		},
 		method,
 	});
