@@ -1,17 +1,10 @@
-import Page from 'components/page';
-import { queryAnalysis, queryFeatures, queryPlaylist } from 'lib/query';
-import { checkAuth, getParamOrThrow, getPromiseMap } from 'lib/routing';
 import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 
-interface TrackAnalysisObject extends SpotifyApi.AudioAnalysisObject {
-	id: string;
-}
+import Page from '~/components/page';
+import { queryAnalysis, queryFeatures, queryPlaylist } from '~/lib/query';
+import { checkAuth, getParamOrThrow, getPromiseMap } from '~/lib/routing';
 
-interface TrackInfo extends SpotifyApi.TrackObjectFull {
-	added_at: string;
-	analysis?: TrackAnalysisObject;
-	features?: SpotifyApi.AudioFeaturesObject;
-}
+import type { TrackAnalysisObject, TrackInfo } from '~/lib/types';
 
 interface PlaylistPageData {
 	playlist: SpotifyApi.PlaylistObjectFull;
@@ -86,8 +79,6 @@ export const Loader = async ({
 					analysis: analysis.find((result) => result.id === trackId),
 					features: features.find((result) => result.id === trackId),
 				};
-				console.log('info for', trackId, trackInfo);
-
 				return [trackId, trackInfo];
 			})
 		);

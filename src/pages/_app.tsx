@@ -1,7 +1,8 @@
 import { Modals } from '@generouted/react-router/lazy';
-import { isLoggedIn } from 'lib/auth';
 import { Outlet } from 'react-router-dom';
 import { Link } from 'router';
+
+import { isLoggedIn } from '~/lib/auth';
 
 export default function App() {
 	const loggedIn = isLoggedIn();

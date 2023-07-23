@@ -20,6 +20,12 @@
 		"noUnusedParameters": false,
 		"noFallthroughCasesInSwitch": false,
 		"baseUrl": "./src",
+		"paths": {
+			"~/components/*": ["components/*"],
+			"~/lib/*": ["lib/*"],
+			"~/pages/*": ["pages/*"],
+			"~/router": ["router.ts"]
+		},
 		"strictNullChecks": false,
 		"allowUnreachableCode": true
 	},

@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs, Params } from 'react-router-dom';
-import { redirect } from 'router';
+
+import { redirect } from '~/router';
 
 import { isLoggedIn } from './auth';
 

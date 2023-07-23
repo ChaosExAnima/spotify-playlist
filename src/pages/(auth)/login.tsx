@@ -1,5 +1,5 @@
-import { logIn } from 'lib/auth';
-import { EmptyComponent } from 'lib/routing';
+import { logIn } from '~/lib/auth';
+import { EmptyComponent } from '~/lib/routing';
 
 export const Loader = logIn;
 

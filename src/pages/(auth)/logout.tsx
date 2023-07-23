@@ -1,5 +1,5 @@
-import { logOut } from 'lib/auth';
-import { EmptyComponent } from 'lib/routing';
+import { logOut } from '~/lib/auth';
+import { EmptyComponent } from '~/lib/routing';
 
 export const Loader = () => logOut();
 

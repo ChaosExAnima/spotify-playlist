@@ -1,8 +1,9 @@
 import Page from 'components/page';
-import { handleLoginCode, isLoggedIn } from 'lib/auth';
-import { queryProfile } from 'lib/query';
 import { useLoaderData } from 'react-router-dom';
 import { Link } from 'router';
+
+import { handleLoginCode, isLoggedIn } from '~/lib/auth';
+import { queryProfile } from '~/lib/query';
 
 export default function HomePage() {
 	const user = useLoaderData() as SpotifyApi.CurrentUsersProfileResponse;

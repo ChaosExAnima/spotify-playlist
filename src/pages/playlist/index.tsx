@@ -1,8 +1,9 @@
-import Page from 'components/page';
-import { queryPlaylists, queryProfile } from 'lib/query';
-import { loadWithAuth } from 'lib/routing';
 import { useLoaderData } from 'react-router-dom';
-import { Link } from 'router';
+
+import Page from '~/components/page';
+import { queryPlaylists, queryProfile } from '~/lib/query';
+import { loadWithAuth } from '~/lib/routing';
+import { Link } from '~/router';
 
 interface PlaylistsData {
 	playlists: SpotifyApi.ListOfCurrentUsersPlaylistsResponse;
