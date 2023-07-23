@@ -1,0 +1,51 @@
+.container {
+	display: grid;
+	grid-template-columns: 8em auto;
+	grid-template-rows: repeat(3, auto);
+	background-color: var(--color-card);
+	border-radius: var(--size-radius);
+	padding: 1em;
+	gap: 1em;
+}
+
+.cover {
+	display: block;
+	aspect-ratio: 1;
+	object-fit: contain;
+	grid-column: 1;
+	grid-row: 1 / -1;
+	width: 100%;
+}
+
+.title,
+.artist {
+	line-height: 1;
+	margin: 0;
+	grid-column: 2;
+}
+.title {
+	font-size: 1.4em;
+}
+.artist {
+	font-size: 1em;
+}
+
+.features {
+	display: grid;
+	gap: 0 1rem;
+	grid-template-rows: repeat(2, auto);
+	grid-auto-columns: min-content;
+	grid-auto-flow: dense;
+	text-align: left;
+}
+
+.features dt {
+	font-size: 0.6em;
+	grid-row: 2 / -1;
+}
+
+.features dd {
+	font-weight: bold;
+	grid-row: 1;
+	margin: 0;
+}

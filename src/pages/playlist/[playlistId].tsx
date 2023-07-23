@@ -1,8 +1,12 @@
 import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 
+import Image from '~/components/image';
 import Page from '~/components/page';
+import TrackDisplay from '~/components/track';
 import { queryAnalysis, queryFeatures, queryPlaylist } from '~/lib/query';
 import { checkAuth, getParamOrThrow, getPromiseMap } from '~/lib/routing';
+
+import classes from './styles.module.css';
 
 import type { TrackAnalysisObject, TrackInfo } from '~/lib/types';
 
@@ -13,33 +17,17 @@ interface PlaylistPageData {
 
 export default function PlaylistPage() {
 	const { playlist, tracks } = useLoaderData() as PlaylistPageData;
-	const headerImage = playlist.images.reduce((biggest, image) =>
-		image.width > biggest.width ? image : biggest
-	);
 	return (
 		<Page header={playlist.name}>
-			{headerImage && (
-				<p>
-					<img
-						alt={`Playlist cover for ${playlist.name}`}
-						height={headerImage.height}
-						src={headerImage.url}
-						width={headerImage.width}
-					/>
-				</p>
-			)}
-			<ul>
+			<Image
+				alt={`Playlist cover for ${playlist.name}`}
+				className={classes.cover}
+				images={playlist.images}
+			/>
+			<ul className={classes.tracks}>
 				{Array.from(tracks.values()).map((track) => (
 					<li key={`${track.id}-${track.added_at}`}>
-						<p>
-							<strong>{track.name}</strong>
-						</p>
-						<p>
-							By{' '}
-							{track.artists.map(({ name }) => name).join(', ')}{' '}
-							on <em>{track.album.name}</em>
-						</p>
-						<p>BPM: {track.features?.tempo ?? 'Unknown'}</p>
+						<TrackDisplay track={track} />
 					</li>
 				))}
 			</ul>
