@@ -10,6 +10,9 @@ export default function App() {
 			{loggedIn && (
 				<header>
 					<nav>
+						<h1>
+							<Link to="/">Spotify Playlists</Link>
+						</h1>
 						<ul>
 							<li>
 								<Link to="/playlist">Playlists</Link>
