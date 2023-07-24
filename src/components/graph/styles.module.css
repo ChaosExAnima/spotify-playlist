@@ -8,7 +8,7 @@
 }
 
 .container figcaption {
-	color: var(--color-card);
+	color: var(--color-mix);
 	display: flex;
 	flex-basis: 100%;
 	font-size: 0.8em;
@@ -18,14 +18,10 @@
 	cursor: pointer;
 }
 
-.container:hover figcaption {
-	color: var(--color-mix);
-}
-
 .track {
-	--color-value: var(--color-mix);
+	--color-value: var(--color-card);
 
-	background-color: var(--color-card);
+	background-color: var(--color-value);
 	border-radius: var(--size-radius);
 	flex-grow: 1;
 	height: 0%;
@@ -53,13 +49,6 @@
 	z-index: 100;
 }
 
-.container:hover .track {
-	background-color: var(--color-value);
-}
-
-.track:hover {
-	text-indent: 0;
-}
 .track:hover::before {
 	display: block;
 }

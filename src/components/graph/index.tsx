@@ -18,7 +18,6 @@ const DEFAULT_FEATURES = [
 	'energy',
 	'instrumentalness',
 	'liveness',
-	'speechiness',
 	'tempo',
 ] as const;
 
