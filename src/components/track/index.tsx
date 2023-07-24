@@ -1,7 +1,9 @@
 import Image from '~/components/image';
-import { TrackInfo } from '~/lib/types';
+import { getColorFromPercent } from '~/lib/color';
 
 import classes from './styles.module.css';
+
+import type { FeatureKeys, TrackInfo } from '~/lib/types';
 
 interface TrackDisplayProps {
 	track: TrackInfo;
@@ -48,15 +50,11 @@ export default function TrackDisplay({ track }: TrackDisplayProps) {
 	);
 }
 
-type KeysOfValueType<O, T> = {
-	[K in keyof O]: O[K] extends T ? K : never;
-}[keyof O];
-
 interface TrackFeatureProps {
 	features: SpotifyApi.AudioFeaturesObject;
 	max?: number;
 	min?: number;
-	name: KeysOfValueType<SpotifyApi.AudioFeaturesObject, number>;
+	name: FeatureKeys;
 	precision?: number;
 }
 
@@ -76,14 +74,16 @@ function TrackFeature({
 
 	let hue = null;
 	if (max && min) {
-		hue = ((feature - min) / (max - min)) * 120;
+		hue = (feature - min) / (max - min);
 	} else if (percentage) {
-		hue = feature * 120;
+		hue = feature;
 	}
 	return (
 		<>
 			<dt>{name}</dt>
-			<dd style={hue && { color: `hsl(${hue},100%,50%)` }}>{value}</dd>
+			<dd style={hue && { color: getColorFromPercent(feature) }}>
+				{value}
+			</dd>
 		</>
 	);
 }

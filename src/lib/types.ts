@@ -7,3 +7,12 @@ export interface TrackInfo extends SpotifyApi.TrackObjectFull {
 	analysis?: TrackAnalysisObject;
 	features?: SpotifyApi.AudioFeaturesObject;
 }
+
+export type KeysOfValueType<O, T> = {
+	[K in keyof O]: O[K] extends T ? K : never;
+}[keyof O];
+
+export type FeatureKeys = KeysOfValueType<
+	SpotifyApi.AudioFeaturesObject,
+	number
+>;

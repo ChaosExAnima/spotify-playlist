@@ -27,6 +27,10 @@
 	-webkit-text-size-adjust: 100%;
 }
 
+* {
+	box-sizing: border-box;
+}
+
 #root {
 	max-width: 1280px;
 	width: 100%;

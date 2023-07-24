@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 
+import Graph from '~/components/graph';
 import Image from '~/components/image';
 import Page from '~/components/page';
 import TrackDisplay from '~/components/track';
@@ -16,21 +17,27 @@ interface PlaylistPageData {
 }
 
 export default function PlaylistPage() {
-	const { playlist, tracks } = useLoaderData() as PlaylistPageData;
+	const { playlist, tracks: tracksMap } = useLoaderData() as PlaylistPageData;
+	const tracks = Array.from(tracksMap.values());
 	return (
 		<Page header={playlist.name}>
-			<Image
-				alt={`Playlist cover for ${playlist.name}`}
-				className={classes.cover}
-				images={playlist.images}
+			<Graph
+				className={classes.graph}
+				initial="danceability"
+				tracks={tracks}
 			/>
 			<ul className={classes.tracks}>
-				{Array.from(tracks.values()).map((track) => (
+				{tracks.map((track) => (
 					<li key={`${track.id}-${track.added_at}`}>
 						<TrackDisplay track={track} />
 					</li>
 				))}
 			</ul>
+			<Image
+				alt={`Playlist cover for ${playlist.name}`}
+				className={classes.cover}
+				images={playlist.images}
+			/>
 		</Page>
 	);
 }
