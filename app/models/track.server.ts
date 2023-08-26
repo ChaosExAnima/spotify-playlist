@@ -2,19 +2,19 @@ import { db } from '~/lib/db.server';
 import { queryAnalysis, queryFeatures } from '~/lib/query';
 import { getPromiseMap } from '~/lib/utils';
 
+import type { Prisma } from '@prisma/client';
 import type { TrackInfo } from '~/lib/types';
 
-async function getTrackFromDb(trackId: string) {
-	let track = await db.track.findUnique({ where: { id: trackId } });
-	if (track) {
-		return {
-			...track,
-			...JSON.parse(track.track),
-			analysis: JSON.parse(track.analysis),
-			features: JSON.parse(track.features),
-		} as TrackInfo;
+function dbTrackToInfo(track?: Prisma.TrackCreateInput) {
+	if (!track) {
+		return null;
 	}
-	return null;
+	return {
+		...track,
+		...JSON.parse(track.track),
+		analysis: JSON.parse(track.analysis),
+		features: JSON.parse(track.features),
+	} as TrackInfo;
 }
 
 export async function getTracksInfo(playlist: SpotifyApi.PlaylistObjectFull) {
@@ -22,22 +22,12 @@ export async function getTracksInfo(playlist: SpotifyApi.PlaylistObjectFull) {
 		playlist.tracks.items.map(({ track }) => track)
 	);
 	const trackIds = Array.from(playlistTracks.keys());
-	const tracks = await Promise.all(
-		trackIds.map(async (trackId) => {
-			const track = await getTrackFromDb(trackId);
-			if (track) {
-				return track;
-			}
-			return trackId;
+	const dbTracks = await indexById(
+		db.track.findMany({
+			where: { id: { in: trackIds } },
 		})
 	);
-	const trackIdsToLoad = tracks.filter(
-		(track): track is string => typeof track === 'string'
-	);
-	if (trackIdsToLoad.length === 0) {
-		return tracks as TrackInfo[];
-	}
-
+	const trackIdsToLoad = trackIds.filter((trackId) => !dbTracks.has(trackId));
 	const { analysis, features } = await getPromiseMap({
 		analysis: indexById(
 			Promise.all(
@@ -50,9 +40,9 @@ export async function getTracksInfo(playlist: SpotifyApi.PlaylistObjectFull) {
 		features: indexById(queryFeatures(trackIdsToLoad)),
 	});
 	return Promise.all(
-		tracks.map(async (trackId) => {
-			if (typeof trackId !== 'string') {
-				return trackId;
+		trackIds.map(async (trackId) => {
+			if (dbTracks.has(trackId)) {
+				return dbTrackToInfo(dbTracks.get(trackId));
 			}
 			const track = playlistTracks.get(trackId);
 			const trackInfo: TrackInfo = {
