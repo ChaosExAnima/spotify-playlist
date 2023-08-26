@@ -5,9 +5,12 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
+	useRouteError,
 } from '@remix-run/react';
 
 import styles from '~/index.css';
+
+import Page from './components/page';
 
 import type { LinksFunction } from '@remix-run/node';
 
@@ -42,3 +45,21 @@ export default function Root() {
 export const links: LinksFunction = () => {
 	return [{ href: styles, rel: 'stylesheet' }];
 };
+
+export function ErrorBoundary() {
+	const error = useRouteError();
+	console.error(error);
+	return (
+		<html>
+			<head>
+				<title>Oh no!</title>
+				<Meta />
+				<Links />
+			</head>
+			<body>
+				<Page header="Page not found" />
+				<Scripts />
+			</body>
+		</html>
+	);
+}

@@ -1,4 +1,5 @@
-import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { type LoaderArgs } from '@remix-run/node';
+import { typedjson, useTypedLoaderData } from 'remix-typedjson';
 
 import Graph from '~/components/graph';
 import Image from '~/components/image';
@@ -6,19 +7,12 @@ import Page from '~/components/page';
 import TrackDisplay from '~/components/track';
 import { queryAnalysis, queryFeatures, queryPlaylist } from '~/lib/query';
 import { checkAuth, getParamOrThrow, getPromiseMap } from '~/lib/routing';
-
-import classes from './styles.module.css';
+import classes from '~/styles.module.css';
 
 import type { TrackAnalysisObject, TrackInfo } from '~/lib/types';
 
-interface PlaylistPageData {
-	playlist: SpotifyApi.PlaylistObjectFull;
-	tracks: Map<string, TrackInfo>;
-}
-
 export default function PlaylistPage() {
-	const { playlist, tracks: tracksMap } = useLoaderData() as PlaylistPageData;
-	const tracks = Array.from(tracksMap.values());
+	const { playlist, tracks } = useTypedLoaderData<typeof loader>();
 	return (
 		<Page header={playlist.name}>
 			<Graph
@@ -42,9 +36,7 @@ export default function PlaylistPage() {
 	);
 }
 
-export const Loader = async ({
-	params,
-}: LoaderFunctionArgs): Promise<PlaylistPageData> => {
+export async function loader({ params }: LoaderArgs) {
 	checkAuth();
 	const playlistId = getParamOrThrow('playlistId', params);
 	try {
@@ -63,23 +55,21 @@ export const Loader = async ({
 			),
 			features: queryFeatures(trackIds),
 		});
-		const tracks = new Map<string, TrackInfo>(
-			trackIds.map((trackId) => {
-				const playlistTrack = playlist.tracks.items.find(
-					(result) => result.track.id === trackId
-				);
-				const trackInfo: TrackInfo = {
-					...playlistTrack.track,
-					added_at: playlistTrack.added_at,
-					analysis: analysis.find((result) => result.id === trackId),
-					features: features.find((result) => result.id === trackId),
-				};
-				return [trackId, trackInfo];
-			})
-		);
-		return { playlist, tracks };
+		const tracks = trackIds.map((trackId) => {
+			const playlistTrack = playlist.tracks.items.find(
+				(result) => result.track.id === trackId
+			);
+			const trackInfo: TrackInfo = {
+				...playlistTrack.track,
+				added_at: playlistTrack.added_at,
+				analysis: analysis.find((result) => result.id === trackId),
+				features: features.find((result) => result.id === trackId),
+			};
+			return trackInfo;
+		});
+		return typedjson({ playlist, tracks });
 	} catch (err) {
 		console.log(err);
 		throw new Response('', { status: 404 });
 	}
-};
+}

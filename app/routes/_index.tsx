@@ -1,14 +1,16 @@
-import { Link, useLoaderData } from '@remix-run/react';
+import { Link } from '@remix-run/react';
+import { typedjson, useTypedLoaderData } from 'remix-typedjson';
 
 import Page from '~/components/page';
 import { isLoggedIn, setToken } from '~/lib/auth';
-import { queryProfile } from '~/lib/query';
+import { queryPlaylists, queryProfile } from '~/lib/query';
 import { sessionFromRequest } from '~/lib/session';
 
 import type { LoaderArgs } from '@remix-run/node';
 
 export default function HomePage() {
-	const user = useLoaderData<typeof loader>();
+	const data = useTypedLoaderData<typeof loader>();
+	const { playlists, user } = data ?? {};
 	return (
 		<Page header="Spotify Playlist">
 			{user && <p>Hi, {user.display_name}!</p>}
@@ -17,6 +19,7 @@ export default function HomePage() {
 					<Link to="/login">Log In</Link>
 				</p>
 			)}
+			<PlaylistPicker playlists={playlists} />
 			<footer>
 				<h2>References</h2>
 				<ul>
@@ -44,12 +47,39 @@ export default function HomePage() {
 	);
 }
 
+function PlaylistPicker({
+	playlists,
+}: {
+	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
+}) {
+	if (!playlists) {
+		return null;
+	}
+	return (
+		<>
+			<p>Pick a playlist:</p>
+			<ul>
+				{playlists.items.map((playlist) => (
+					<li key={playlist.id}>
+						<Link to={`/playlist/${playlist.id}`}>
+							{playlist.name}
+						</Link>
+					</li>
+				))}
+			</ul>
+		</>
+	);
+}
+
 export async function loader({ request }: LoaderArgs) {
 	const session = await sessionFromRequest(request);
 	await setToken(session);
 	if (isLoggedIn()) {
 		try {
-			return queryProfile();
+			return typedjson({
+				playlists: await queryPlaylists(),
+				user: await queryProfile(),
+			});
 		} catch (err) {
 			console.log(err);
 			return null;

@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { getColorFromPercent } from '~/lib/color';
-import { FeatureKeys, TrackInfo } from '~/lib/types';
 
 import classes from './styles.module.css';
+
+import type { FeatureKeys, TrackInfo } from '~/lib/types';
 
 interface GraphProps {
 	className?: string;
 	initial: FeatureKeys;
-	tracks: readonly TrackInfo[];
+	tracks: TrackInfo[];
 	validFeatures?: readonly FeatureKeys[];
 }
 
@@ -70,6 +71,7 @@ export default function Graph({
 				{validFeatures.map((feat) => (
 					<span
 						className={feat === feature && 'active'}
+						key={feat}
 						onClick={clickHandler(feat)}
 					>
 						{feat}

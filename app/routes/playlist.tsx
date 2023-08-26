@@ -1,17 +1,11 @@
-import { useLoaderData } from 'react-router-dom';
+import { Link, useLoaderData } from '@remix-run/react';
 
 import Page from '~/components/page';
 import { queryPlaylists, queryProfile } from '~/lib/query';
 import { loadWithAuth } from '~/lib/routing';
-import { Link } from '~/router';
-
-interface PlaylistsData {
-	playlists: SpotifyApi.ListOfCurrentUsersPlaylistsResponse;
-	user: SpotifyApi.CurrentUsersProfileResponse;
-}
 
 export default function PlaylistsPage() {
-	const { playlists, user } = useLoaderData() as PlaylistsData;
+	const { playlists, user } = useLoaderData<typeof loader>();
 	return (
 		<Page>
 			<p>Hi, {user.display_name}!</p>
@@ -19,12 +13,7 @@ export default function PlaylistsPage() {
 			<ul>
 				{playlists.items.map((item) => (
 					<li key={item.id}>
-						<Link
-							params={{ playlistId: item.id }}
-							to="/playlist/:playlistId"
-						>
-							{item.name}
-						</Link>
+						<Link to={`/playlist/${item.id}`}>{item.name}</Link>
 					</li>
 				))}
 			</ul>
@@ -32,7 +21,7 @@ export default function PlaylistsPage() {
 	);
 }
 
-export const Loader = loadWithAuth({
+export const loader = loadWithAuth({
 	playlists: queryPlaylists,
 	user: queryProfile,
 });
