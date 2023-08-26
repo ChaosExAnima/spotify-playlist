@@ -6,7 +6,7 @@ type QueryParams = ConstructorParameters<typeof URLSearchParams>[0];
 
 export async function fetchFromAPI<Result = unknown>(
 	url: string,
-	method: Method,
+	method: Method = 'GET',
 	headers: HeadersInit = {},
 	body?: BodyInit
 ) {
@@ -42,8 +42,8 @@ export function fetchWithBasic<Result = unknown>(
 
 export function fetchWithToken<Result = unknown>(
 	endpoint: string,
-	method: Method = 'GET',
-	query: ConstructorParameters<typeof URLSearchParams>[0] = {}
+	query: ConstructorParameters<typeof URLSearchParams>[0] = {},
+	method: Method = 'GET'
 ) {
 	const token = getToken();
 	if (!token) {

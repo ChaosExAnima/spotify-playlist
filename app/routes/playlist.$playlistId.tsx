@@ -1,8 +1,10 @@
 import { type LoaderArgs } from '@remix-run/node';
+import { useNavigation } from '@remix-run/react';
 import { typedjson, useTypedLoaderData } from 'remix-typedjson';
 
 import Graph from '~/components/graph';
 import Image from '~/components/image';
+import LoadingComponent from '~/components/loading';
 import Page from '~/components/page';
 import TrackDisplay from '~/components/track';
 import { queryPlaylist } from '~/lib/api/query';
@@ -12,6 +14,10 @@ import classes from '~/styles.module.css';
 
 export default function PlaylistPage() {
 	const { playlist, tracks } = useTypedLoaderData<typeof loader>();
+	const nav = useNavigation();
+	if (nav.state === 'loading') {
+		return <LoadingComponent />;
+	}
 	return (
 		<Page header={playlist.name}>
 			<Graph
