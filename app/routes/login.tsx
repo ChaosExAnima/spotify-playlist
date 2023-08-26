@@ -7,5 +7,5 @@ export async function loader({ request }: LoaderArgs) {
 	if (login) {
 		return login;
 	}
-	return logIn(request);
+	return logIn();
 }

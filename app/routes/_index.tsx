@@ -2,9 +2,9 @@ import { Link } from '@remix-run/react';
 import { typedjson, useTypedLoaderData } from 'remix-typedjson';
 
 import Page from '~/components/page';
+import { APIError, queryPlaylists, queryProfile } from '~/lib/api';
 import { isLoggedIn, setToken } from '~/lib/auth';
-import { queryPlaylists, queryProfile } from '~/lib/query';
-import { sessionFromRequest } from '~/lib/session';
+import { saveSessionHeaders, sessionFromRequest } from '~/lib/session';
 
 import type { LoaderArgs } from '@remix-run/node';
 
@@ -76,14 +76,24 @@ export async function loader({ request }: LoaderArgs) {
 	await setToken(session);
 	if (isLoggedIn()) {
 		try {
-			return typedjson({
-				playlists: await queryPlaylists(),
-				user: await queryProfile(),
-			});
+			return typedjson(
+				{
+					playlists: await queryPlaylists(),
+					user: await queryProfile(),
+				},
+				await saveSessionHeaders(session)
+			);
 		} catch (err) {
-			console.log(err);
-			return null;
+			if (err instanceof APIError) {
+				const msg: SpotifyApi.ErrorObject = await err.response.json();
+				console.warn(
+					`Got status ${err.response.status}: ${msg.message}`
+				);
+			} else {
+				console.warn(err);
+			}
 		}
 	}
+
 	return null;
 }

@@ -1,7 +1,7 @@
 import { Link, useLoaderData } from '@remix-run/react';
 
 import Page from '~/components/page';
-import { queryPlaylists, queryProfile } from '~/lib/query';
+import { queryPlaylists, queryProfile } from '~/lib/api/query';
 import { loadWithAuth } from '~/lib/routing';
 
 export default function PlaylistsPage() {

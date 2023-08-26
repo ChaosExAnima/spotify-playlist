@@ -23,12 +23,16 @@ export function sessionFromRequest(request: Request) {
 	return getSession(request.headers.get('Cookie'));
 }
 
-export async function saveSession(session: Session, path = '/') {
-	return redirect(path, {
+export async function saveSessionHeaders(session: Session) {
+	return {
 		headers: {
 			'Set-Cookie': await commitSession(session),
 		},
-	});
+	};
+}
+
+export async function saveSession(session: Session, path = '/') {
+	return redirect(path, await saveSessionHeaders(session));
 }
 
 export async function deleteSession(request: Request, path = '/') {

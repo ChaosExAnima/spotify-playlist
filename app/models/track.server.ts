@@ -1,5 +1,5 @@
 import { db } from '~/lib/db.server';
-import { queryAnalysis, queryFeatures } from '~/lib/query';
+import { queryAnalysis, queryFeatures } from '~/lib/api/query';
 import { getPromiseMap } from '~/lib/utils';
 
 import type { Prisma } from '@prisma/client';

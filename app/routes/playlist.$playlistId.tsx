@@ -5,7 +5,7 @@ import Graph from '~/components/graph';
 import Image from '~/components/image';
 import Page from '~/components/page';
 import TrackDisplay from '~/components/track';
-import { queryPlaylist } from '~/lib/query';
+import { queryPlaylist } from '~/lib/api/query';
 import { checkAuth, getParamOrThrow } from '~/lib/routing';
 import { getTracksInfo } from '~/models/track.server';
 import classes from '~/styles.module.css';
