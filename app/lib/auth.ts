@@ -44,8 +44,8 @@ export async function logIn() {
 	throw redirect(url);
 }
 
-export async function handleLoginCode(): Promise<void> {
-	if (!getRedirectCode()) {
+export async function handleLoginCode(request: Request): Promise<void> {
+	if (!getRedirectCode(request)) {
 		return;
 	}
 	const codeVerifier = cookies.get(VERIFIER_COOKIE);
@@ -53,7 +53,7 @@ export async function handleLoginCode(): Promise<void> {
 		return;
 	}
 	try {
-		await fetchAuthInfo(codeVerifier);
+		await fetchAuthInfo(request, codeVerifier);
 	} catch (err) {
 		console.log(err);
 		return;
@@ -86,11 +86,11 @@ function getAuthInfo() {
 }
 
 /**
- *
  * @returns The current redirect code
  */
-function getRedirectCode() {
-	const params = new URL().searchParams;
+export function getRedirectCode(request: Request) {
+	const params = new URL(request.url).searchParams;
+
 	const code = params.get('code');
 	const state = params.get('state');
 	if (state === process.env.STATE) {
@@ -99,14 +99,14 @@ function getRedirectCode() {
 }
 
 function getAuthRedirectUrl(codeChallenge: string) {
-	if (!process.env.CLIENT_ID || !process.env.REDIRECT) {
+	if (!process.env.CLIENT_ID || !process.env.STATE) {
 		throw new Error('Env not set!');
 	}
 	const params = new URLSearchParams({
 		client_id: process.env.CLIENT_ID,
 		code_challenge: codeChallenge,
 		code_challenge_method: 'S256',
-		redirect_uri: process.env.REDIRECT,
+		redirect_uri: `${process.env.HOST}/login`,
 		response_type: 'code',
 		scope: 'playlist-read-private',
 		state: process.env.STATE,
@@ -142,8 +142,8 @@ async function generateCodeChallenge(codeVerifier: string) {
 	return base64encode(digest);
 }
 
-async function fetchAuthInfo(codeVerifier: string) {
-	const code = getRedirectCode();
+async function fetchAuthInfo(request: Request, codeVerifier: string) {
+	const code = getRedirectCode(request);
 	if (!code) {
 		throw new Error('No redirect code found');
 	}

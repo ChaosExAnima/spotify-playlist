@@ -1,8 +1,10 @@
 import { Link, useLoaderData } from '@remix-run/react';
 
 import Page from '~/components/page';
-import { isLoggedIn } from '~/lib/auth';
+import { handleLoginCode, isLoggedIn } from '~/lib/auth';
 import { queryProfile } from '~/lib/query';
+
+import type { LoaderArgs } from '@remix-run/node';
 
 export default function HomePage() {
 	const user = useLoaderData<typeof loader>();
@@ -41,11 +43,13 @@ export default function HomePage() {
 	);
 }
 
-export async function loader(): Promise<SpotifyApi.CurrentUsersProfileResponse | null> {
-	// await handleLoginCode();
+export async function loader({ request }: LoaderArgs) {
+	await handleLoginCode(request);
+	console.log(isLoggedIn());
+
 	if (isLoggedIn()) {
 		try {
-			return await queryProfile();
+			return queryProfile();
 		} catch (err) {
 			console.log(err);
 			return null;

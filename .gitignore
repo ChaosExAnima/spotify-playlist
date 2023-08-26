@@ -12,9 +12,6 @@ dist
 dist-ssr
 *.local
 
-public
-.env
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -25,5 +22,8 @@ public
 *.njsproj
 *.sln
 *.sw?
-.cache
-build
+
+# Remix
+/public/build
+/build
+.env
