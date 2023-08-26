@@ -1,7 +1,9 @@
-import { LoaderArgs, redirect } from '@remix-run/node';
-import { Params } from '@remix-run/react';
+import { redirect } from '@remix-run/node';
 
 import { isLoggedIn } from './auth';
+
+import type { LoaderArgs } from '@remix-run/node';
+import type { Params } from '@remix-run/react';
 
 type QueryLoaderFunc<T> = (args: LoaderArgs) => Promise<T>;
 type QueryMap<T> = {
@@ -41,10 +43,6 @@ export function loadWithAuth<T>(
 			throw new Response(String(err), { status: 500 });
 		}
 	};
-}
-
-export function EmptyComponent(): null {
-	return null;
 }
 
 export function checkAuth() {

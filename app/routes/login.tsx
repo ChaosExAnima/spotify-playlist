@@ -1,12 +1,11 @@
-import { type LoaderFunction, redirect } from '@remix-run/node';
+import { type LoaderArgs } from '@remix-run/node';
 
-import { getRedirectCode, handleLoginCode, logIn } from '~/lib/auth';
+import { handleLoginCode, logIn } from '~/lib/auth';
 
-export const loader: LoaderFunction = async ({ request }) => {
-	console.log(getRedirectCode(request));
-	if (getRedirectCode(request)) {
-		await handleLoginCode(request);
-		throw redirect('/');
+export async function loader({ request }: LoaderArgs) {
+	const login = await handleLoginCode(request);
+	if (login) {
+		return login;
 	}
-	await logIn();
-};
+	return logIn(request);
+}

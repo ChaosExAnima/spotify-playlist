@@ -1,8 +1,9 @@
 import { Link, useLoaderData } from '@remix-run/react';
 
 import Page from '~/components/page';
-import { handleLoginCode, isLoggedIn } from '~/lib/auth';
+import { isLoggedIn, setToken } from '~/lib/auth';
 import { queryProfile } from '~/lib/query';
+import { sessionFromRequest } from '~/lib/session';
 
 import type { LoaderArgs } from '@remix-run/node';
 
@@ -44,9 +45,8 @@ export default function HomePage() {
 }
 
 export async function loader({ request }: LoaderArgs) {
-	await handleLoginCode(request);
-	console.log(isLoggedIn());
-
+	const session = await sessionFromRequest(request);
+	await setToken(session);
 	if (isLoggedIn()) {
 		try {
 			return queryProfile();

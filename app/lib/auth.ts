@@ -1,5 +1,6 @@
-import { redirect } from '@remix-run/node';
-import cookies from 'js-cookie';
+import { saveSession, sessionFromRequest } from './session';
+
+import type { Session } from './session';
 
 // All taken from https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
 
@@ -21,63 +22,70 @@ interface ErrorResponse {
 	error_description: string;
 }
 
-const TOKEN_COOKIE = 'token';
-const VERIFIER_COOKIE = 'verifier';
+const TOKEN_SESSION_KEY = 'token';
+const VERIFIER_SESSION_KEY = 'verifier';
 
-export function isLoggedIn() {
-	return !!getAuthInfo();
+export interface AuthSession {
+	[TOKEN_SESSION_KEY]?: AuthInfo;
+	[VERIFIER_SESSION_KEY]?: string;
 }
+
+export let token: string = null;
 
 export function getToken() {
-	const authInfo = getAuthInfo();
-	if (authInfo && authInfo.expires < Date.now()) {
-		return authInfo.access;
-	}
-	return null;
+	return token;
 }
 
-export async function logIn() {
+export async function setToken(session: Session) {
+	const authInfo = await getAuthInfo(session);
+	if (authInfo && authInfo.expires < Date.now()) {
+		token = authInfo.access;
+	}
+}
+
+export function isLoggedIn() {
+	return !!token;
+}
+
+export async function logIn(request: Request) {
 	const codeVerifier = generateRandomString(128);
 	const codeChallenge = await generateCodeChallenge(codeVerifier);
-	cookies.set(VERIFIER_COOKIE, codeVerifier, { sameSite: 'strict' });
+	const session = await sessionFromRequest(request);
+	session.set(VERIFIER_SESSION_KEY, codeVerifier);
+	console.log('set verifier');
 	const url = getAuthRedirectUrl(codeChallenge);
-	throw redirect(url);
+	return saveSession(session, url);
 }
 
-export async function handleLoginCode(request: Request): Promise<void> {
+export async function handleLoginCode(request: Request) {
 	if (!getRedirectCode(request)) {
-		return;
+		console.log('no code');
+		return false;
 	}
-	const codeVerifier = cookies.get(VERIFIER_COOKIE);
+	const session = await sessionFromRequest(request);
+	const codeVerifier = session.get(VERIFIER_SESSION_KEY);
 	if (!codeVerifier) {
-		return;
+		console.log('no verifier');
+		return false;
 	}
 	try {
-		await fetchAuthInfo(request, codeVerifier);
+		const authInfo = await fetchAuthInfo(request, codeVerifier);
+		if (authInfo) {
+			console.log('set auth info:', authInfo);
+			session.set(TOKEN_SESSION_KEY, authInfo);
+		} else {
+			console.log('no auth info');
+		}
 	} catch (err) {
 		console.log(err);
-		return;
 	}
-	cookies.remove(VERIFIER_COOKIE);
-	throw redirect('/');
+	session.unset(VERIFIER_SESSION_KEY);
+	return saveSession(session);
 }
 
-/**
- * Logs out
- * @param doRedirect Whether to do a redirect as well
- */
-export function logOut(doRedirect = true) {
-	cookies.remove(VERIFIER_COOKIE);
-	cookies.remove(TOKEN_COOKIE);
-	if (doRedirect) {
-		throw redirect('/');
-	}
-}
-
-function getAuthInfo() {
-	const token = cookies.get(TOKEN_COOKIE);
-	if (token) {
-		const authInfo = JSON.parse(token) as AuthInfo;
+async function getAuthInfo(session: Session) {
+	if (session.has(TOKEN_SESSION_KEY)) {
+		const authInfo = session.get(TOKEN_SESSION_KEY);
 		if ('access' in authInfo && 'expires' in authInfo) {
 			return authInfo;
 		}
@@ -94,6 +102,7 @@ export function getRedirectCode(request: Request) {
 	const code = params.get('code');
 	const state = params.get('state');
 	if (state === process.env.STATE) {
+		console.log('code:', code);
 		return code;
 	}
 }
@@ -152,7 +161,7 @@ async function fetchAuthInfo(request: Request, codeVerifier: string) {
 		code,
 		code_verifier: codeVerifier,
 		grant_type: 'authorization_code',
-		redirect_uri: process.env.REDIRECT,
+		redirect_uri: `${process.env.HOST}/login`,
 	});
 	const bearer = btoa(
 		`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
@@ -180,5 +189,5 @@ async function fetchAuthInfo(request: Request, codeVerifier: string) {
 		expires: Date.now() + result.expires_in,
 		refresh: result.refresh_token,
 	};
-	cookies.set('token', JSON.stringify(authInfo), { sameSite: 'strict' });
+	return authInfo;
 }
