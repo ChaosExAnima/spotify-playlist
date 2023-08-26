@@ -31,7 +31,7 @@
 	box-sizing: border-box;
 }
 
-#root {
+main {
 	max-width: 1280px;
 	width: 100%;
 	margin: 0 auto;

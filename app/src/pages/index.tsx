@@ -20,6 +20,7 @@ export default function HomePage() {
 					<li>
 						<a
 							href="https://developer.spotify.com/documentation/web-api/reference/"
+							rel="noreferrer"
 							target="_blank"
 						>
 							Spotify API
@@ -28,6 +29,7 @@ export default function HomePage() {
 					<li>
 						<a
 							href="https://reactrouter.com/en/main/start/overview"
+							rel="noreferrer"
 							target="_blank"
 						>
 							React Router

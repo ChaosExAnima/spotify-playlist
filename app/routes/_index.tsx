@@ -1,29 +1,55 @@
-import { Link, Outlet } from '@remix-run/react';
+import { Link, useLoaderData } from '@remix-run/react';
 
+import Page from '~/components/page';
 import { isLoggedIn } from '~/lib/auth';
+import { queryProfile } from '~/lib/query';
 
-export default function App() {
-	const loggedIn = isLoggedIn();
+export default function HomePage() {
+	const user = useLoaderData<typeof loader>();
 	return (
-		<>
-			{loggedIn && (
-				<header>
-					<nav>
-						<h1>
-							<Link to="/">Spotify Playlists</Link>
-						</h1>
-						<ul>
-							<li>
-								<Link to="/playlist">Playlists</Link>
-							</li>
-							<li>
-								<Link to="/logout">Log out</Link>
-							</li>
-						</ul>
-					</nav>
-				</header>
+		<Page header="Spotify Playlist">
+			{user && <p>Hi, {user.display_name}!</p>}
+			{!user && (
+				<p>
+					<Link to="/login">Log In</Link>
+				</p>
 			)}
-			<Outlet />
-		</>
+			<footer>
+				<h2>References</h2>
+				<ul>
+					<li>
+						<a
+							href="https://developer.spotify.com/documentation/web-api/reference/"
+							rel="noreferrer"
+							target="_blank"
+						>
+							Spotify API
+						</a>
+					</li>
+					<li>
+						<a
+							href="https://reactrouter.com/en/main/start/overview"
+							rel="noreferrer"
+							target="_blank"
+						>
+							React Router
+						</a>
+					</li>
+				</ul>
+			</footer>
+		</Page>
 	);
+}
+
+export async function loader(): Promise<SpotifyApi.CurrentUsersProfileResponse | null> {
+	// await handleLoginCode();
+	if (isLoggedIn()) {
+		try {
+			return await queryProfile();
+		} catch (err) {
+			console.log(err);
+			return null;
+		}
+	}
+	return null;
 }

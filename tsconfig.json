@@ -28,6 +28,5 @@
 		"forceConsistentCasingInFileNames": true,
 		"allowUnreachableCode": true
 	},
-	"include": ["remix.env.ts", "**/*.ts", "**/*.tsx"],
-	"references": [{ "path": "./tsconfig.node.json" }]
+	"include": ["remix.env.ts", "**/*.ts", "**/*.tsx", "remix.config.cjs"]
 }

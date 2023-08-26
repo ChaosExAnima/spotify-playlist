@@ -90,7 +90,7 @@ function getAuthInfo() {
  * @returns The current redirect code
  */
 function getRedirectCode() {
-	const params = new URL(window.location.toString()).searchParams;
+	const params = new URL().searchParams;
 	const code = params.get('code');
 	const state = params.get('state');
 	if (state === process.env.STATE) {
@@ -135,7 +135,7 @@ function base64encode(input: string) {
 async function generateCodeChallenge(codeVerifier: string) {
 	const encoder = new TextEncoder();
 	const data = encoder.encode(codeVerifier);
-	const digestBytes = await window.crypto.subtle.digest('SHA-256', data);
+	const digestBytes = await globalThis.crypto.subtle.digest('SHA-256', data);
 	const digest = String.fromCharCode(
 		...Array.from(new Uint8Array(digestBytes))
 	);

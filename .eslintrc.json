@@ -4,9 +4,8 @@
 		"es2020": true
 	},
 	"extends": [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:react-hooks/recommended",
+		"@remix-run/eslint-config",
+		"@remix-run/eslint-config/node",
 		"plugin:@tanstack/eslint-plugin-query/recommended",
 		"plugin:perfectionist/recommended-natural",
 		"prettier"
@@ -16,6 +15,7 @@
 		"ecmaVersion": "latest",
 		"sourceType": "module"
 	},
+	"ignorePatterns": ["public/*"],
 	"rules": {
 		"perfectionist/sort-imports": [
 			"warn",
