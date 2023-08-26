@@ -36,6 +36,12 @@ export function queryPlaylists() {
 	);
 }
 
+export function queryTracks(trackIds: string[]) {
+	return fetchFromAPI<SpotifyApi.MultipleTracksResponse>(
+		`/tracks?ids=${trackIds.join(',')}`
+	);
+}
+
 export async function queryFeatures(trackIds: string[]) {
 	const response =
 		await fetchFromAPI<SpotifyApi.MultipleAudioFeaturesResponse>(

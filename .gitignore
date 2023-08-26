@@ -27,3 +27,7 @@ dist-ssr
 /public/build
 /build
 .env
+
+# Prisma
+*.db
+*.db-journal

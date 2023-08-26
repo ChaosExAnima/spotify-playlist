@@ -3,7 +3,7 @@ export interface TrackAnalysisObject extends SpotifyApi.AudioAnalysisObject {
 }
 
 export interface TrackInfo extends SpotifyApi.TrackObjectFull {
-	added_at: string;
+	added_at: Date;
 	analysis?: TrackAnalysisObject;
 	features?: SpotifyApi.AudioFeaturesObject;
 }
