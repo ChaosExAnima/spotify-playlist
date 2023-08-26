@@ -1,10 +1,9 @@
-import { LoaderFunctionArgs, Params } from 'react-router-dom';
-
-import { redirect } from '~/router';
+import { LoaderArgs, redirect } from '@remix-run/node';
+import { Params } from '@remix-run/react';
 
 import { isLoggedIn } from './auth';
 
-type QueryLoaderFunc<T> = (args: LoaderFunctionArgs) => Promise<T>;
+type QueryLoaderFunc<T> = (args: LoaderArgs) => Promise<T>;
 type QueryMap<T> = {
 	[K in keyof T]: T[K] extends QueryLoaderFunc<infer U>
 		? QueryLoaderFunc<U>
@@ -22,7 +21,7 @@ type QueryResult<T> = {
 
 export function loadWithAuth<T>(
 	queries: Readonly<QueryMap<T>>
-): (args: LoaderFunctionArgs) => Promise<QueryResult<T>> {
+): (args: LoaderArgs) => Promise<QueryResult<T>> {
 	return async (args): Promise<Readonly<QueryResult<T>>> => {
 		checkAuth();
 		try {

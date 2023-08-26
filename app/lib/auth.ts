@@ -1,5 +1,5 @@
+import { redirect } from '@remix-run/node';
 import cookies from 'js-cookie';
-import { redirect } from 'react-router-dom';
 
 // All taken from https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
 
@@ -93,26 +93,23 @@ function getRedirectCode() {
 	const params = new URL(window.location.toString()).searchParams;
 	const code = params.get('code');
 	const state = params.get('state');
-	if (state === import.meta.env.VITE_APP_STATE) {
+	if (state === process.env.STATE) {
 		return code;
 	}
 }
 
 function getAuthRedirectUrl(codeChallenge: string) {
-	if (
-		!import.meta.env.VITE_APP_CLIENT_ID ||
-		!import.meta.env.VITE_APP_REDIRECT
-	) {
+	if (!process.env.CLIENT_ID || !process.env.REDIRECT) {
 		throw new Error('Env not set!');
 	}
 	const params = new URLSearchParams({
-		client_id: import.meta.env.VITE_APP_CLIENT_ID,
+		client_id: process.env.CLIENT_ID,
 		code_challenge: codeChallenge,
 		code_challenge_method: 'S256',
-		redirect_uri: import.meta.env.VITE_APP_REDIRECT,
+		redirect_uri: process.env.REDIRECT,
 		response_type: 'code',
 		scope: 'playlist-read-private',
-		state: import.meta.env.VITE_APP_STATE,
+		state: process.env.STATE,
 	});
 	return `https://accounts.spotify.com/authorize?${params}`;
 }
@@ -151,16 +148,14 @@ async function fetchAuthInfo(codeVerifier: string) {
 		throw new Error('No redirect code found');
 	}
 	const body = new URLSearchParams({
-		client_id: import.meta.env.VITE_APP_CLIENT_ID,
+		client_id: process.env.CLIENT_ID,
 		code,
 		code_verifier: codeVerifier,
 		grant_type: 'authorization_code',
-		redirect_uri: import.meta.env.VITE_APP_REDIRECT,
+		redirect_uri: process.env.REDIRECT,
 	});
 	const bearer = btoa(
-		`${import.meta.env.VITE_APP_CLIENT_ID}:${
-			import.meta.env.VITE_APP_CLIENT_SECRET
-		}`
+		`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
 	);
 	const options: RequestInit = {
 		body,

@@ -1,7 +1,6 @@
-import Page from 'components/page';
-import { useLoaderData } from 'react-router-dom';
-import { Link } from 'router';
+import { Link, useLoaderData } from '@remix-run/react';
 
+import Page from '~/components/page';
 import { handleLoginCode, isLoggedIn } from '~/lib/auth';
 import { queryProfile } from '~/lib/query';
 
@@ -40,7 +39,7 @@ export default function HomePage() {
 	);
 }
 
-export async function Loader(): Promise<SpotifyApi.CurrentUsersProfileResponse | null> {
+export async function loader(): Promise<SpotifyApi.CurrentUsersProfileResponse | null> {
 	await handleLoginCode();
 	if (isLoggedIn()) {
 		try {

@@ -2,11 +2,12 @@
 	"compilerOptions": {
 		"target": "ES2020",
 		"useDefineForClassFields": true,
-		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
 		"module": "ESNext",
 		"skipLibCheck": true,
 
 		/* Bundler mode */
+		"esModuleInterop": true,
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
 		"resolveJsonModule": true,
@@ -19,16 +20,14 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noFallthroughCasesInSwitch": false,
-		"baseUrl": "./src",
+		"baseUrl": ".",
 		"paths": {
-			"~/components/*": ["components/*"],
-			"~/lib/*": ["lib/*"],
-			"~/pages/*": ["pages/*"],
-			"~/router": ["router.ts"]
+			"~/*": ["./app/*"]
 		},
 		"strictNullChecks": false,
+		"forceConsistentCasingInFileNames": true,
 		"allowUnreachableCode": true
 	},
-	"include": ["globals.d.ts", "src"],
+	"include": ["remix.env.ts", "**/*.ts", "**/*.tsx"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }
