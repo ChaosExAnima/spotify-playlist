@@ -21,6 +21,16 @@ type QueryResult<T> = {
 		: T[K];
 };
 
+export function baseUrl() {
+	return `http${process.env.SSL ? 's' : ''}://${
+		process.env.HOST ?? 'localhost'
+	}`;
+}
+
+export function url(path: string) {
+	return baseUrl() + path;
+}
+
 export function loadWithAuth<T>(
 	queries: Readonly<QueryMap<T>>
 ): (args: LoaderArgs) => Promise<QueryResult<T>> {

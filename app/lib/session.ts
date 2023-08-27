@@ -9,7 +9,6 @@ export type Session = Awaited<ReturnType<typeof sessionFromRequest>>;
 const { commitSession, destroySession, getSession } =
 	createCookieSessionStorage<SessionData>({
 		cookie: {
-			// domain: process.env.HOST,
 			httpOnly: true,
 			maxAge: 60 * 60 * 24, // one day
 			name: '__session',

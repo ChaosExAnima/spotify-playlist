@@ -1,6 +1,7 @@
 import { redirect } from 'remix-typedjson';
 
 import { fetchAuthInfo, fetchRefreshedAuth } from './api';
+import { url } from './routing';
 import { saveSession, sessionFromRequest } from './session';
 
 import type { Session } from './session';
@@ -95,7 +96,7 @@ function getAuthRedirectUrl() {
 	}
 	const params = new URLSearchParams({
 		client_id: process.env.CLIENT_ID,
-		redirect_uri: `${process.env.HOST}/login`,
+		redirect_uri: url('/login'),
 		response_type: 'code',
 		scope: 'playlist-read-private',
 		state: process.env.STATE,

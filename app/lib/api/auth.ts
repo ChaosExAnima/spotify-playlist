@@ -1,3 +1,4 @@
+import { url } from '../routing';
 import { fetchWithBasic } from './common';
 
 import type { AuthInfo } from '../auth';
@@ -16,7 +17,7 @@ export async function fetchAuthInfo(code: string) {
 	const response = await fetchWithBasic<TokenResponse>('/token', 'POST', {
 		code,
 		grant_type: 'authorization_code',
-		redirect_uri: `${process.env.HOST}/login`,
+		redirect_uri: url('/login'),
 	});
 
 	const authInfo: AuthInfo = {
