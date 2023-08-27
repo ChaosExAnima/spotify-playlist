@@ -85,11 +85,13 @@ export async function loader({ request }: LoaderArgs) {
 			);
 		} catch (err) {
 			if (err instanceof APIError) {
-				const msg: SpotifyApi.ErrorObject =
-					(await err.response.json()) ?? 'none';
-				console.warn(
-					`Got status ${err.response.status}: ${msg.message}\n${err.stack}`
-				);
+				if (err.response.status !== 401) {
+					const msg: SpotifyApi.ErrorObject =
+						(await err.response.json()) ?? 'none';
+					console.warn(
+						`Got status ${err.response.status}: ${msg.message}\n${err.stack}`
+					);
+				}
 			} else {
 				console.warn(err);
 			}
