@@ -1,6 +1,6 @@
 import { redirect } from 'remix-typedjson';
 
-import { fetchAuthInfo, fetchRefreshedAuth } from './api';
+import { APIError, fetchAuthInfo, fetchRefreshedAuth } from './api';
 import { url } from './routing';
 import { saveSession, sessionFromRequest } from './session';
 
@@ -37,9 +37,11 @@ export async function setToken(session: Session) {
 		token = authInfo.access;
 		return;
 	}
-	const newAuthInfo = await fetchRefreshedAuth(authInfo);
-	session.set(TOKEN_SESSION_KEY, newAuthInfo);
-	token = newAuthInfo.access;
+	try {
+		const newAuthInfo = await fetchRefreshedAuth(authInfo);
+		session.set(TOKEN_SESSION_KEY, newAuthInfo);
+		token = newAuthInfo.access;
+	} catch (err) {}
 }
 
 export function isLoggedIn() {
@@ -62,7 +64,10 @@ export async function handleLoginCode(request: Request) {
 			session.set(TOKEN_SESSION_KEY, authInfo);
 		}
 	} catch (err) {
-		console.log(err);
+		if (err instanceof APIError) {
+			const json = await err.response.json();
+			console.log(json);
+		}
 	}
 	return saveSession(session);
 }
