@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { getToken } from '../auth';
 import { APIError } from './errors';
 
@@ -16,6 +17,9 @@ export async function fetchFromAPI<Result = unknown>(
 		method,
 	});
 	if (!response.ok) {
+		if (response.status === 401) {
+			redirect('/login');
+		}
 		throw new APIError(`Got error from API: ${response.status}`, response);
 	}
 	return response.json() as Result;
@@ -40,12 +44,12 @@ export function fetchWithBasic<Result = unknown>(
 	);
 }
 
-export function fetchWithToken<Result = unknown>(
+export async function fetchWithToken<Result = unknown>(
 	endpoint: string,
 	query: ConstructorParameters<typeof URLSearchParams>[0] = {},
 	method: Method = 'GET'
 ) {
-	const token = getToken();
+	const token = await getToken();
 	if (!token) {
 		throw new Error('No auth info found');
 	}

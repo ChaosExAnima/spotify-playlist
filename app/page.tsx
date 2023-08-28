@@ -3,10 +3,9 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import LoadingComponent from '~/components/loading';
 import { queryPlaylists, queryProfile } from '~/lib/api';
-import { isLoggedIn } from '~/lib/auth';
 
 export default async function Home() {
-	const user = await getUser();
+	const user = await queryProfile();
 	return (
 		<Page header="Spotify Playlist">
 			{user && <p>Hi, {user.display_name}!</p>}
@@ -66,11 +65,4 @@ async function PlaylistPicker() {
 			</ul>
 		</>
 	);
-}
-
-async function getUser() {
-	if (isLoggedIn()) {
-		return await queryProfile();
-	}
-	return null;
 }

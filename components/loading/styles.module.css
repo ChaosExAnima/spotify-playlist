@@ -3,7 +3,7 @@
 	height: 16px;
 	box-shadow: 0 30px, 0 -30px;
 	border-radius: 4px;
-	background: currentColor;
+	background: var(--color-accent);
 	display: block;
 	margin: -50px auto 0;
 	position: relative;
@@ -20,7 +20,7 @@
 	height: 16px;
 	box-shadow: 0 30px, 0 -30px;
 	border-radius: 4px;
-	background: currentColor;
+	background: var(--color-accent);
 	color: #fff;
 	position: absolute;
 	left: 30px;

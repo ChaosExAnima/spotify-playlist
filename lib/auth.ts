@@ -22,7 +22,7 @@ export interface AuthSession {
 
 export let token: string | null = null;
 
-export function getToken() {
+export async function getToken() {
 	if (token) {
 		return token;
 	}
@@ -30,31 +30,15 @@ export function getToken() {
 	if (!authInfo) {
 		return null;
 	}
+	console.log('token expiration:', new Date(authInfo.expires));
 	if (authInfo.expires < Date.now()) {
 		token = authInfo.access;
 		return token;
-	}
-	return null;
-}
-
-export async function setToken() {
-	const authInfo = getAuthInfo();
-	if (!authInfo) {
-		return;
-	}
-	if (authInfo.expires < Date.now()) {
-		token = authInfo.access;
-		return;
-	}
-	try {
+	} else {
 		const newAuthInfo = await fetchRefreshedAuth(authInfo);
 		cookies().set(TOKEN_SESSION_KEY, JSON.stringify(newAuthInfo));
-		token = newAuthInfo.access;
-	} catch (err) {}
-}
-
-export function isLoggedIn() {
-	return !!getToken();
+		return getToken();
+	}
 }
 
 export function logIn() {

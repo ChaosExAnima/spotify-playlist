@@ -18,13 +18,16 @@ export async function generateMetadata({
 	params,
 }: PlaylistPageProps): Promise<Metadata> {
 	const { playlistId } = params;
-	const playlist = await queryPlaylist(playlistId);
-	if (!playlist) {
-		notFound();
-	}
-	return {
-		title: playlist.name,
-	};
+	try {
+		const playlist = await queryPlaylist(playlistId);
+		if (!playlist) {
+			notFound();
+		}
+		return {
+			title: playlist.name,
+		};
+	} catch {}
+	return {};
 }
 
 export default async function PlaylistPage({
