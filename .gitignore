@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# Prisma
+*.db
+*.db-journal
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
