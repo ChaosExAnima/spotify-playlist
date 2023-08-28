@@ -8,3 +8,9 @@ declare global {
 		keys<T>(o: T): (keyof T)[];
 	}
 }
+namespace NodeJS {
+	interface ProcessEnv {
+		readonly CLIENT_ID: string;
+		readonly CLIENT_SECRET: string;
+	}
+}

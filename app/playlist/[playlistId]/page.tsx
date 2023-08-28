@@ -5,7 +5,7 @@ import LoadingComponent from '~/components/loading';
 import Page from '~/components/page';
 import TrackDisplay from '~/components/track';
 import { queryPlaylist } from '~/lib/api/query';
-import { getTracksInfo } from '~/models/track.server';
+import { getTracksInfo } from '~/models/track';
 import classes from './page.module.css';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';

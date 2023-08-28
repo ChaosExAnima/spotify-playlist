@@ -1,4 +1,4 @@
-import { db } from '~/lib/db.server';
+import { db } from '~/lib/db';
 import { queryAnalysis, queryFeatures } from '~/lib/api/query';
 import { getPromiseMap } from '~/lib/utils';
 

@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import LoadingComponent from '~/components/loading';
 import { queryPlaylists, queryProfile } from '~/lib/api';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './api/auth/[...nextAuth]/router';
+import LogIn from '~/components/log-in';
 
 export default async function Home() {
 	return (
@@ -38,28 +41,25 @@ export default async function Home() {
 }
 
 async function UserInfo() {
-	let user: SpotifyApi.CurrentUsersProfileResponse | null = null;
-	try {
-		user = await queryProfile();
-	} catch {}
+	const session = await getServerSession(authOptions);
+	if (!session) {
+		return (
+			<p>
+				<LogIn />
+			</p>
+		);
+	}
+	const user = await queryProfile();
 	return (
 		<>
-			{user && <p>Hi, {user.display_name}!</p>}
-			{user && (
-				<p>
-					<Link href="/logout">Log out here</Link>
-				</p>
-			)}
-			{!user && (
-				<p>
-					<Link href="/login">Log In</Link>
-				</p>
-			)}
-			{user && (
-				<Suspense fallback={<LoadingComponent />}>
-					<PlaylistPicker />
-				</Suspense>
-			)}
+			<p>Hi, {user.display_name}!</p>
+
+			<p>
+				<Link href="/logout">Log out here</Link>
+			</p>
+			<Suspense fallback={<LoadingComponent />}>
+				<PlaylistPicker />
+			</Suspense>
 		</>
 	);
 }
