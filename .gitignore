@@ -23,11 +23,20 @@ dist-ssr
 *.sln
 *.sw?
 
-# Remix
-/public/build
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
 /build
-.env
 
 # Prisma
 *.db
 *.db-journal
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
