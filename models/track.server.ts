@@ -17,19 +17,17 @@ function dbTrackToInfo(track?: Prisma.TrackCreateInput) {
 	} as TrackInfo;
 }
 
-export async function getTracksInfo(playlist: SpotifyApi.PlaylistObjectFull) {
-	const playlistTracks = await indexById(
-		playlist.tracks.items.map(({ track }) => track)
-	);
-	const trackIds = Array.from(playlistTracks.keys());
-	const dbTracks = await indexById(
+export async function getTracksInfo(baseTracks: SpotifyApi.TrackObjectFull[]) {
+	const baseTracksMap = indexById(baseTracks);
+	const trackIds = Array.from(baseTracksMap.keys());
+	const dbTracks = await asyncIndexById(
 		db.track.findMany({
 			where: { id: { in: trackIds } },
 		})
 	);
 	const trackIdsToLoad = trackIds.filter((trackId) => !dbTracks.has(trackId));
 	const { analysis, features } = await getPromiseMap({
-		analysis: indexById(
+		analysis: asyncIndexById(
 			Promise.all(
 				trackIdsToLoad.map(async (track) => ({
 					...(await queryAnalysis(track)),
@@ -37,14 +35,17 @@ export async function getTracksInfo(playlist: SpotifyApi.PlaylistObjectFull) {
 				}))
 			)
 		),
-		features: indexById(queryFeatures(trackIdsToLoad)),
+		features: asyncIndexById(queryFeatures(trackIdsToLoad)),
 	});
 	return Promise.all(
 		trackIds.map(async (trackId) => {
 			if (dbTracks.has(trackId)) {
-				return dbTrackToInfo(dbTracks.get(trackId));
+				return dbTrackToInfo(dbTracks.get(trackId)) as TrackInfo;
 			}
-			const track = playlistTracks.get(trackId);
+			const track = baseTracksMap.get(trackId);
+			if (!track) {
+				throw new Error(`Could not find track ${trackId}`);
+			}
 			const trackInfo: TrackInfo = {
 				...track,
 				added_at: new Date(),
@@ -67,9 +68,17 @@ export async function getTracksInfo(playlist: SpotifyApi.PlaylistObjectFull) {
 	);
 }
 
-async function indexById<Object extends { id: string }>(
-	objectsPromise: Object[] | Promise<Object[]>
+interface Entity {
+	id: string;
+}
+
+function indexById<Object extends Entity>(objects: Object[]) {
+	return new Map(objects.map((object) => [object.id, object]));
+}
+
+async function asyncIndexById<Object extends Entity>(
+	objectsPromise: Promise<Object[]> | Object[]
 ) {
 	const objects = await objectsPromise;
-	return new Map(objects.map((object) => [object.id, object]));
+	return indexById<Object>(objects);
 }

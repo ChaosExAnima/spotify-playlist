@@ -1,102 +1,74 @@
-import Image from 'next/image';
-import styles from './page.module.css';
+import Page from '~/components/page';
+import Link from 'next/link';
+import { Suspense } from 'react';
+import LoadingComponent from '~/components/loading';
+import { queryPlaylists, queryProfile } from '~/lib/api';
+import { isLoggedIn } from '~/lib/auth';
 
-export default function Home() {
+export default async function Home() {
+	const user = await getUser();
 	return (
-		<main className={styles.main}>
-			<div className={styles.description}>
+		<Page header="Spotify Playlist">
+			{user && <p>Hi, {user.display_name}!</p>}
+			{!user && (
 				<p>
-					Get started by editing&nbsp;
-					<code className={styles.code}>app/page.tsx</code>
+					<Link href="/login">Log In</Link>
 				</p>
-				<div>
-					<a
-						href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						By{' '}
-						<Image
-							src="/vercel.svg"
-							alt="Vercel Logo"
-							className={styles.vercelLogo}
-							width={100}
-							height={24}
-							priority
-						/>
-					</a>
-				</div>
-			</div>
-
-			<div className={styles.center}>
-				<Image
-					className={styles.logo}
-					src="/next.svg"
-					alt="Next.js Logo"
-					width={180}
-					height={37}
-					priority
-				/>
-			</div>
-
-			<div className={styles.grid}>
-				<a
-					href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					className={styles.card}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2>
-						Docs <span>-&gt;</span>
-					</h2>
-					<p>
-						Find in-depth information about Next.js features and
-						API.
-					</p>
-				</a>
-
-				<a
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					className={styles.card}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2>
-						Learn <span>-&gt;</span>
-					</h2>
-					<p>
-						Learn about Next.js in an interactive course
-						with&nbsp;quizzes!
-					</p>
-				</a>
-
-				<a
-					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					className={styles.card}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2>
-						Templates <span>-&gt;</span>
-					</h2>
-					<p>Explore the Next.js 13 playground.</p>
-				</a>
-
-				<a
-					href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					className={styles.card}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2>
-						Deploy <span>-&gt;</span>
-					</h2>
-					<p>
-						Instantly deploy your Next.js site to a shareable URL
-						with Vercel.
-					</p>
-				</a>
-			</div>
-		</main>
+			)}
+			{user && (
+				<Suspense fallback={<LoadingComponent />}>
+					<PlaylistPicker />
+				</Suspense>
+			)}
+			<footer>
+				<h2>References</h2>
+				<ul>
+					<li>
+						<a
+							href="https://developer.spotify.com/documentation/web-api/reference/"
+							rel="noreferrer"
+							target="_blank"
+						>
+							Spotify API
+						</a>
+					</li>
+					<li>
+						<a
+							href="https://reactrouter.com/en/main/start/overview"
+							rel="noreferrer"
+							target="_blank"
+						>
+							React Router
+						</a>
+					</li>
+				</ul>
+			</footer>
+		</Page>
 	);
+}
+
+async function PlaylistPicker() {
+	const playlists = await queryPlaylists();
+	if (!playlists) {
+		return null;
+	}
+	return (
+		<>
+			<p>Pick a playlist:</p>
+			<ul>
+				{playlists.items.map((playlist) => (
+					<li key={playlist.id}>
+						<Link href={`/playlist/${playlist.id}`}>
+							{playlist.name}
+						</Link>
+					</li>
+				))}
+			</ul>
+		</>
+	);
+}
+
+async function getUser() {
+	isLoggedIn();
+	return await queryProfile();
 }
