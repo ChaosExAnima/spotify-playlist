@@ -69,6 +69,8 @@ async function PlaylistPicker() {
 }
 
 async function getUser() {
-	isLoggedIn();
-	return await queryProfile();
+	if (isLoggedIn()) {
+		return await queryProfile();
+	}
+	return null;
 }

@@ -1,7 +1,7 @@
-import { url } from '../routing';
 import { fetchWithBasic } from './common';
 
 import type { AuthInfo } from '../auth';
+import { url } from '../routing';
 
 interface TokenResponse {
 	access_token: string;
@@ -10,7 +10,7 @@ interface TokenResponse {
 	scope: string;
 }
 
-export async function fetchAuthInfo(code: string) {
+export async function fetchAuthInfo(code: string | null) {
 	if (!code) {
 		throw new Error('No redirect code found');
 	}

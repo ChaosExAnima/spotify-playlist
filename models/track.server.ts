@@ -3,7 +3,7 @@ import { queryAnalysis, queryFeatures } from '~/lib/api/query';
 import { getPromiseMap } from '~/lib/utils';
 
 import type { Prisma } from '@prisma/client';
-import type { TrackInfo } from '~/lib/types';
+import { objectHasKeys, type TrackInfo } from '~/lib/types';
 
 function dbTrackToInfo(track?: Prisma.TrackCreateInput) {
 	if (!track) {
@@ -73,7 +73,11 @@ interface Entity {
 }
 
 function indexById<Object extends Entity>(objects: Object[]) {
-	return new Map(objects.map((object) => [object.id, object]));
+	return new Map(
+		objects
+			.filter((object) => objectHasKeys(object, 'id'))
+			.map((object) => [object.id, object])
+	);
 }
 
 async function asyncIndexById<Object extends Entity>(

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { getColorFromPercent } from '~/lib/color';
@@ -42,10 +44,14 @@ export default function Graph({
 				return {
 					[feature]: {
 						max: Math.max(
-							...tracks.map((track) => track.features[feature])
+							...tracks.map(
+								(track) => track.features[feature] ?? 0
+							)
 						),
 						min: Math.min(
-							...tracks.map((track) => track.features[feature])
+							...tracks.map(
+								(track) => track.features[feature] ?? 0
+							)
 						),
 					},
 				};
@@ -70,7 +76,7 @@ export default function Graph({
 			<figcaption>
 				{validFeatures.map((feat) => (
 					<span
-						className={feat === feature && 'active'}
+						className={feat === feature ? 'active' : ''}
 						key={feat}
 						onClick={clickHandler(feat)}
 					>

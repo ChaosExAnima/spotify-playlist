@@ -1,10 +1,8 @@
-import { redirect } from 'remix-typedjson';
-
+import { redirect } from 'next/navigation';
 import { APIError, fetchAuthInfo, fetchRefreshedAuth } from './api';
 import { url } from './routing';
-import { saveSession, sessionFromRequest } from './session';
-
-import type { Session } from './session';
+import { cookies } from 'next/headers';
+import { isPlainObject, objectHasKeys } from './types';
 
 // All taken from https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow
 
@@ -22,14 +20,25 @@ export interface AuthSession {
 	[VERIFIER_SESSION_KEY]?: string;
 }
 
-export let token: string = null;
+export let token: string | null = null;
 
 export function getToken() {
-	return token;
+	if (token) {
+		return token;
+	}
+	const authInfo = getAuthInfo();
+	if (!authInfo) {
+		return null;
+	}
+	if (authInfo.expires < Date.now()) {
+		token = authInfo.access;
+		return token;
+	}
+	return null;
 }
 
-export async function setToken(session: Session) {
-	const authInfo = getAuthInfo(session);
+export async function setToken() {
+	const authInfo = getAuthInfo();
 	if (!authInfo) {
 		return;
 	}
@@ -39,29 +48,30 @@ export async function setToken(session: Session) {
 	}
 	try {
 		const newAuthInfo = await fetchRefreshedAuth(authInfo);
-		session.set(TOKEN_SESSION_KEY, newAuthInfo);
+		cookies().set(TOKEN_SESSION_KEY, JSON.stringify(newAuthInfo));
 		token = newAuthInfo.access;
 	} catch (err) {}
 }
 
 export function isLoggedIn() {
-	return !!token;
+	return !!getToken();
 }
 
 export function logIn() {
 	const url = getAuthRedirectUrl();
-	return redirect(url, { status: 302 });
+	return redirect(url);
 }
 
 export async function handleLoginCode(request: Request) {
-	if (!getRedirectCode(request)) {
+	const code = getRedirectCode(request);
+	if (!code) {
 		return false;
 	}
-	const session = await sessionFromRequest(request);
 	try {
-		const authInfo = await fetchAuthInfo(getToken());
-		if (authInfo) {
-			session.set(TOKEN_SESSION_KEY, authInfo);
+		const authInfo = await fetchAuthInfo(code);
+		if (isAuthInfo(authInfo)) {
+			cookies().set(TOKEN_SESSION_KEY, JSON.stringify(authInfo));
+			return true;
 		}
 	} catch (err) {
 		if (err instanceof APIError) {
@@ -69,15 +79,21 @@ export async function handleLoginCode(request: Request) {
 			console.log(json);
 		}
 	}
-	return saveSession(session);
+	return false;
 }
 
-function getAuthInfo(session: Session) {
-	if (session.has(TOKEN_SESSION_KEY)) {
-		const authInfo = session.get(TOKEN_SESSION_KEY);
-		if ('access' in authInfo && 'expires' in authInfo) {
-			return authInfo;
-		}
+function isAuthInfo(value: unknown): value is AuthInfo {
+	return objectHasKeys(value, ['access', 'expires', 'refresh']);
+}
+
+function getAuthInfo() {
+	const rawAuthInfo = cookies().get(TOKEN_SESSION_KEY);
+	if (!rawAuthInfo || !rawAuthInfo.value) {
+		return null;
+	}
+	const authInfo = JSON.parse(rawAuthInfo.value);
+	if (isAuthInfo(authInfo)) {
+		return authInfo;
 	}
 	return null;
 }

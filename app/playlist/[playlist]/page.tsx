@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import { Suspense } from 'react';
 import Graph from '~/components/graph';
 import Image from '~/components/image';
@@ -7,19 +6,14 @@ import Page from '~/components/page';
 import TrackDisplay from '~/components/track';
 import { queryPlaylist } from '~/lib/api/query';
 import { getTracksInfo } from '~/models/track.server';
-import classes from '~/styles.module.css';
+import classes from './page.module.css';
 
-export default async function PlaylistPage() {
-	const router = useRouter();
-	if (typeof router.query.playlist !== 'string') {
-		throw new Error('Invalid playlist ID');
-	}
-	const playlist = await queryPlaylist(router.query.playlist);
-	const tracks = await getTracksInfo(
-		playlist.tracks.items
-			.map((playlistTrack) => playlistTrack.track)
-			.filter((i): i is SpotifyApi.TrackObjectFull => !!i)
-	);
+export default async function PlaylistPage({
+	params: { playlist: playlistId },
+}: {
+	params: { playlist: string };
+}) {
+	const { playlist, tracks } = await getTrackData(playlistId);
 	return (
 		<Page header={playlist?.name ?? 'Loading...'}>
 			<Suspense fallback={<LoadingComponent />}>
@@ -43,4 +37,17 @@ export default async function PlaylistPage() {
 			</Suspense>
 		</Page>
 	);
+}
+
+async function getTrackData(playlistId?: string) {
+	if (!playlistId || typeof playlistId !== 'string') {
+		throw new Error('Invalid playlist ID');
+	}
+	const playlist = await queryPlaylist(playlistId);
+	const tracks = await getTracksInfo(
+		playlist.tracks.items
+			.map((playlistTrack) => playlistTrack.track)
+			.filter((i): i is SpotifyApi.TrackObjectFull => !!i)
+	);
+	return { playlist, tracks };
 }
