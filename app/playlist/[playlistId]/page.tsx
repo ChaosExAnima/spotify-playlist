@@ -8,6 +8,7 @@ import { queryPlaylist } from '~/lib/api/query';
 import { getTracksInfo } from '~/models/track.server';
 import classes from './page.module.css';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 interface PlaylistPageProps {
 	params: { playlistId: string };
@@ -18,6 +19,9 @@ export async function generateMetadata({
 }: PlaylistPageProps): Promise<Metadata> {
 	const { playlistId } = params;
 	const playlist = await queryPlaylist(playlistId);
+	if (!playlist) {
+		notFound();
+	}
 	return {
 		title: playlist.name,
 	};

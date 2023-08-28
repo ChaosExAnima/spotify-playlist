@@ -1,6 +1,6 @@
 .container {
-	align-content: end;
-	align-items: end;
+	align-content: flex-end;
+	align-items: flex-end;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1em 2px;

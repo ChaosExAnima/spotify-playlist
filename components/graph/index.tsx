@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { getColorFromPercent } from '~/lib/color';
+import { getColorFromPercent, toPercent } from '~/lib/math';
 
 import classes from './styles.module.css';
 
@@ -115,5 +115,11 @@ function Bar({ feature, map, track }: BarProps) {
 			getColorFromPercent(percent)
 		);
 	}, [feature, map, value]);
-	return <div className={classes.track} data-title={track.name} ref={ref} />;
+	return (
+		<div
+			className={classes.track}
+			data-title={`${track.name}: ${toPercent(value)}`}
+			ref={ref}
+		/>
+	);
 }

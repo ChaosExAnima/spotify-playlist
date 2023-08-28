@@ -4,14 +4,6 @@ import { Suspense } from 'react';
 import LoadingComponent from '~/components/loading';
 import { queryPlaylists, queryProfile } from '~/lib/api';
 import { isLoggedIn } from '~/lib/auth';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-	title: {
-		default: 'Spotify Playlist',
-		template: '%s | Spotify Playlist',
-	},
-};
 
 export default async function Home() {
 	const user = await getUser();

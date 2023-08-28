@@ -1,5 +1,5 @@
 import Image from '~/components/image';
-import { getColorFromPercent } from '~/lib/color';
+import { getColorFromPercent, toPercent } from '~/lib/math';
 
 import classes from './styles.module.css';
 
@@ -32,20 +32,22 @@ export default function TrackDisplay({ track }: TrackDisplayProps) {
 					''
 				)}
 			</h2>
-			<dl className={classes.features}>
-				<TrackFeature features={features} name="danceability" />
-				<TrackFeature features={features} name="energy" />
-				<TrackFeature features={features} name="liveness" />
-				<TrackFeature features={features} name="loudness" />
-				<TrackFeature features={features} name="speechiness" />
-				<TrackFeature
-					features={features}
-					max={180}
-					min={70}
-					name="tempo"
-				/>
-				<TrackFeature features={features} name="valence" />
-			</dl>
+			{features && (
+				<dl className={classes.features}>
+					<TrackFeature features={features} name="danceability" />
+					<TrackFeature features={features} name="energy" />
+					<TrackFeature features={features} name="liveness" />
+					<TrackFeature features={features} name="loudness" />
+					<TrackFeature features={features} name="speechiness" />
+					<TrackFeature
+						features={features}
+						max={180}
+						min={70}
+						name="tempo"
+					/>
+					<TrackFeature features={features} name="valence" />
+				</dl>
+			)}
 		</div>
 	);
 }
@@ -66,10 +68,10 @@ function TrackFeature({
 	precision = 1,
 }: TrackFeatureProps) {
 	const feature = features[name];
-	const rounding = Math.pow(10, precision);
 	const percentage = feature > 0 && feature <= 1;
+	const rounding = Math.pow(10, precision);
 	const value = percentage
-		? `${Math.round(feature * 100)}%`
+		? toPercent(feature, precision)
 		: Math.round(feature * rounding) / rounding;
 
 	let hue = null;
@@ -81,7 +83,7 @@ function TrackFeature({
 	return (
 		<>
 			<dt>{name}</dt>
-			<dd style={hue && { color: getColorFromPercent(feature) }}>
+			<dd style={hue ? { color: getColorFromPercent(feature) } : {}}>
 				{value}
 			</dd>
 		</>
