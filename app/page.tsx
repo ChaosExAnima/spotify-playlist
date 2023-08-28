@@ -5,20 +5,11 @@ import LoadingComponent from '~/components/loading';
 import { queryPlaylists, queryProfile } from '~/lib/api';
 
 export default async function Home() {
-	const user = await queryProfile();
 	return (
 		<Page header="Spotify Playlist">
-			{user && <p>Hi, {user.display_name}!</p>}
-			{!user && (
-				<p>
-					<Link href="/login">Log In</Link>
-				</p>
-			)}
-			{user && (
-				<Suspense fallback={<LoadingComponent />}>
-					<PlaylistPicker />
-				</Suspense>
-			)}
+			<Suspense fallback={<LoadingComponent />}>
+				<UserInfo />
+			</Suspense>
 			<footer>
 				<h2>References</h2>
 				<ul>
@@ -43,6 +34,33 @@ export default async function Home() {
 				</ul>
 			</footer>
 		</Page>
+	);
+}
+
+async function UserInfo() {
+	let user: SpotifyApi.CurrentUsersProfileResponse | null = null;
+	try {
+		user = await queryProfile();
+	} catch {}
+	return (
+		<>
+			{user && <p>Hi, {user.display_name}!</p>}
+			{user && (
+				<p>
+					<Link href="/logout">Log out here</Link>
+				</p>
+			)}
+			{!user && (
+				<p>
+					<Link href="/login">Log In</Link>
+				</p>
+			)}
+			{user && (
+				<Suspense fallback={<LoadingComponent />}>
+					<PlaylistPicker />
+				</Suspense>
+			)}
+		</>
 	);
 }
 

@@ -30,7 +30,6 @@ export async function getToken() {
 	if (!authInfo) {
 		return null;
 	}
-	console.log('token expiration:', new Date(authInfo.expires));
 	if (authInfo.expires < Date.now()) {
 		token = authInfo.access;
 		return token;
@@ -44,6 +43,10 @@ export async function getToken() {
 export function logIn() {
 	const url = getAuthRedirectUrl();
 	return redirect(url);
+}
+
+export function logOut() {
+	cookies().delete(TOKEN_SESSION_KEY);
 }
 
 export async function handleLoginCode(request: Request) {
