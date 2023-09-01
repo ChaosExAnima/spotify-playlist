@@ -11,6 +11,24 @@ export const authOptions: NextAuthOptions = {
 			clientSecret: process.env.CLIENT_SECRET as string,
 		}),
 	],
+	debug: true,
+	callbacks: {
+		async session({ session, user }) {
+			const getToken = await db.account.findFirst({
+				where: {
+					userId: user.id,
+				},
+			});
+
+			let accessToken: string | null = null;
+			if (getToken) {
+				accessToken = getToken.access_token;
+			}
+
+			session.user.token = accessToken;
+			return session;
+		},
+	},
 };
 
 const handler = NextAuth(authOptions);

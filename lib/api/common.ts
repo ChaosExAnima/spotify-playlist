@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
-import { getToken } from '../auth';
 import { APIError } from './errors';
+import { db } from '../db';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '~/app/api/auth/[...nextauth]/route';
 
 type Method = 'GET' | 'POST';
 type QueryParams = ConstructorParameters<typeof URLSearchParams>[0];
@@ -18,7 +20,7 @@ export async function fetchFromAPI<Result = unknown>(
 	});
 	if (!response.ok) {
 		if (response.status === 401) {
-			redirect('/login');
+			redirect('/api/auth/login/spotify');
 		}
 		throw new APIError(`Got error from API: ${response.status}`, response);
 	}
@@ -66,4 +68,9 @@ export async function fetchWithToken<Result = unknown>(
 		},
 		method === 'POST' ? params : undefined
 	);
+}
+
+async function getToken() {
+	const session = await getServerSession(authOptions);
+	return session?.user.token;
 }

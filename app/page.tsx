@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 import LoadingComponent from '~/components/loading';
 import { queryPlaylists, queryProfile } from '~/lib/api';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from './api/auth/[...nextAuth]/router';
-import LogIn from '~/components/log-in';
+import { authOptions } from './api/auth/[...nextauth]/route';
+import { LogIn, LogOut } from '~/components/auth';
 
 export default async function Home() {
 	return (
@@ -34,6 +34,15 @@ export default async function Home() {
 							React Router
 						</a>
 					</li>
+					<li>
+						<a
+							href="https://next-auth.js.org/getting-started"
+							rel="noreferrer"
+							target="_blank"
+						>
+							Next Auth
+						</a>
+					</li>
 				</ul>
 			</footer>
 		</Page>
@@ -55,7 +64,7 @@ async function UserInfo() {
 			<p>Hi, {user.display_name}!</p>
 
 			<p>
-				<Link href="/logout">Log out here</Link>
+				<LogOut />
 			</p>
 			<Suspense fallback={<LoadingComponent />}>
 				<PlaylistPicker />
@@ -66,7 +75,7 @@ async function UserInfo() {
 
 async function PlaylistPicker() {
 	const playlists = await queryPlaylists();
-	if (!playlists) {
+	if (!playlists || playlists.items.length === 0) {
 		return null;
 	}
 	return (
